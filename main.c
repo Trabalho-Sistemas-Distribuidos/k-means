@@ -99,10 +99,9 @@ int main(int argc, char* argv[])
 	{
 		if(i==rank)
 			continue;
-		MPI_Isend(&(centroides[rank].x),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,requests+i);
-		MPI_Isend(&(centroides[rank].y),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,requests+i);
+		MPI_Send(&(centroides[rank].x),1,MPI_FLOAT,i,42,MPI_COMM_WORLD);//,requests+i);
+		MPI_Send(&(centroides[rank].y),1,MPI_FLOAT,i,42,MPI_COMM_WORLD);//,requests+i);
 	}
-	
 	
 	for(i=0; i<size; i++)
 	{
@@ -112,30 +111,25 @@ int main(int argc, char* argv[])
 		MPI_Recv(&(centroides[i].y),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 		
 	}
-	
 	for(i=0; i<numIteracoes; i++)
 	{
 		int j;
-		for(j=0; j<size; j++)
-		{
-			if(j==size) continue;
-			MPI_Wait(requests+i,MPI_STATUS_IGNORE);
-		}
 		centroides[rank]=atualizaCentroide(fp,centroides,size,rank);
 		
 		for(j=0; j<size; j++)
 		{
 			if(j==rank)
 				continue;
-			MPI_Isend(&(centroides[rank].x),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,requests+j);
-			MPI_Isend(&(centroides[rank].y),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,requests+j);
+			printf("%d estou aqui\n",rank);
+			MPI_Send(&(centroides[rank].x),1,MPI_FLOAT,j,42,MPI_COMM_WORLD);
+			MPI_Send(&(centroides[rank].y),1,MPI_FLOAT,j,42,MPI_COMM_WORLD);
 		}
 		for(j=0; j<size; j++)
 		{
 			if(j==rank)
 				continue;
-			MPI_Recv(&(centroides[j].x),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			MPI_Recv(&(centroides[j].y),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+			MPI_Recv(&(centroides[j].x),1,MPI_FLOAT,j,42,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+			MPI_Recv(&(centroides[j].y),1,MPI_FLOAT,j,42,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 		}
 	}
 	printf("o centroide de numero %d é (%f,%f)\n", rank,centroides[rank].x,centroides[rank].y);
