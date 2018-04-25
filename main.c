@@ -35,7 +35,7 @@ int centroideMaisPerto(float x,float y,Ponto* centroides,int size)
 Ponto atualizaCentroide(FILE* fp,Ponto* centroides,int size,int rank)
 {
 	Ponto aux;
-	char buffer[100];
+	char buffer[1000];
 	aux.x=0;
 	aux.y=0;
 	
@@ -71,7 +71,7 @@ Ponto atualizaCentroide(FILE* fp,Ponto* centroides,int size,int rank)
 }
 
 
-
+// argv[0] file numPoints numIteracoes xMIn xMax yMin yMax
 int main(int argc, char* argv[])
 {
 	int size;
