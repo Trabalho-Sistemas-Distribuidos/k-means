@@ -45,7 +45,7 @@ Ponto atualizaCentroide(FILE* fp,Ponto* centroides,int size,int rank)
 	{
 		float xAux,yAux;
 		fgets(buffer,1000,fp);
-		sscanf(buffer,"%d %d",&xAux,&yAux);
+		sscanf(buffer,"%f %f",&xAux,&yAux);
 		if(centroideMaisPerto(xAux,yAux,centroides,size)==rank)
 		{
 			aux.x+=xAux;
@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 	
 	srand(time(NULL));
 	
-	MPI_init(argc,argv);
+	MPI_Init(&argc,&argv);
 	MPI_Comm_size(MPI_COMM_WORLD,&size);
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 	numPoints=atoi(argv[2]);
@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
 	xCentroide=(rank/size)*(xMax-xMin)+xMin;
 	yCentroide=(rank/size)*(yMax-yMin)+yMin;
 	
-	Ponto* centroides = (Ponto*) calloc(sizeof(Ponto)*size);
+	Ponto* centroides = (Ponto*) calloc(sizeof(Ponto)*size,0);
 	centroides[rank].x=xCentroide;
 	centroides[rank].y=yCentroide;
 	
@@ -99,8 +99,8 @@ int main(int argc, char* argv[])
 	{
 		if(i==rank)
 			continue;
-		MPI_ISend(&(centroides[rank].x),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,requests+i);
-		MPI_ISend(&(centroides[rank].y),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,requests+i);
+		MPI_Isend(&(centroides[rank].x),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,requests+i);
+		MPI_Isend(&(centroides[rank].y),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,requests+i);
 	}
 	
 	
@@ -108,8 +108,8 @@ int main(int argc, char* argv[])
 	{
 		if(i==rank)
 			continue;
-		MPI_Recv(&(centroides[i].x),1,MPI_FLOAT,i,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-		MPI_Recv(&(centroides[i].y),1,MPI_FLOAT,i,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&(centroides[i].x),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&(centroides[i].y),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 		
 	}
 	
@@ -127,15 +127,15 @@ int main(int argc, char* argv[])
 		{
 			if(j==rank)
 				continue;
-			MPI_ISend(&(centroides[rank].x),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,requests+j);
-			MPI_ISend(&(centroides[rank].y),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,requests+j);
+			MPI_Isend(&(centroides[rank].x),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,requests+j);
+			MPI_Isend(&(centroides[rank].y),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,requests+j);
 		}
 		for(j=0; j<size; j++)
 		{
 			if(j==rank)
 				continue;
-			MPI_Recv(&(centroides[j].x),1,MPI_FLOAT,i,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			MPI_Recv(&(centroides[j].y),1,MPI_FLOAT,i,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+			MPI_Recv(&(centroides[j].x),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+			MPI_Recv(&(centroides[j].y),1,MPI_FLOAT,i,42,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 		}
 	}
 	printf("o centroide de numero %d é (%f,%f)\n", rank,centroides[rank].x,centroides[rank].y);
