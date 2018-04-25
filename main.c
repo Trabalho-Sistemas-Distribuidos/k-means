@@ -29,7 +29,7 @@ int centroideMaisPerto(float x,float y,Ponto* centroides,int size)
 			rankMenorDistancia=i;
 		}
 	}
-	return i;
+	return rankMenorDistancia;
 }
 
 Ponto atualizaCentroide(FILE* fp,Ponto* centroides,int size,int rank)
@@ -46,16 +46,27 @@ Ponto atualizaCentroide(FILE* fp,Ponto* centroides,int size,int rank)
 		float xAux,yAux;
 		fgets(buffer,1000,fp);
 		sscanf(buffer,"%f %f",&xAux,&yAux);
-		if(centroideMaisPerto(xAux,yAux,centroides,size)==rank)
+		int centroide = centroideMaisPerto(xAux,yAux,centroides,size);
+		printf("%d centroide mais proximo %d\n", rank,centroide);
+		if(centroide==rank)
 		{
 			aux.x+=xAux;
 			aux.y+=yAux;
 			n++;
 		}
 	}
+	printf("Esse é o valor de n : %d\n", n);
 	rewind(fp);
-	aux.x/=n;
-	aux.y/=n;
+	if(n)
+	{
+		aux.x/=n;
+		aux.y/=n;
+	}
+	else
+	{
+		aux.x=centroides[rank].x;
+		aux.y=centroides[rank].y;
+	}
 	return aux;
 }
 
@@ -86,8 +97,8 @@ int main(int argc, char* argv[])
 	numIteracoes=atoi(argv[3]);
 	
 	float xCentroide, yCentroide;
-	xCentroide=(rank/size)*(xMax-xMin)+xMin;
-	yCentroide=(rank/size)*(yMax-yMin)+yMin;
+	xCentroide=rank;
+	yCentroide=rank;
 	
 	Ponto* centroides = (Ponto*) calloc(sizeof(Ponto)*size,0);
 	centroides[rank].x=xCentroide;
@@ -115,12 +126,10 @@ int main(int argc, char* argv[])
 	{
 		int j;
 		centroides[rank]=atualizaCentroide(fp,centroides,size,rank);
-		
 		for(j=0; j<size; j++)
 		{
 			if(j==rank)
 				continue;
-			printf("%d estou aqui\n",rank);
 			MPI_Send(&(centroides[rank].x),1,MPI_FLOAT,j,42,MPI_COMM_WORLD);
 			MPI_Send(&(centroides[rank].y),1,MPI_FLOAT,j,42,MPI_COMM_WORLD);
 		}
