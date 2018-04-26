@@ -6,7 +6,7 @@
 #include <float.h>
 
 // numProcessos == numCentroides
-//format : argv[0] file numPoints NumIteracoes xMin xMax yMin yMax
+//format : argv[0] file NumIteracoes
 
 typedef struct Ponto
 {
@@ -98,7 +98,7 @@ Ponto atualizaCentroide(FILE* fp,Ponto* centroides,int size,int rank)
 }
 
 
-// argv[0] file numPoints numIteracoes xMIn xMax yMin yMax
+// argv[0] file numIteracoes
 int main(int argc, char* argv[])
 {
 	int size;
