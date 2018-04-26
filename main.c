@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <float.h>
 
 // numProcessos == numCentroides
 //format : argv[0] file numPoints NumIteracoes xMin xMax yMin yMax
@@ -12,6 +13,32 @@ typedef struct Ponto
 	float x;
 	float y;
 }Ponto;
+
+void descreverOArquivo(FILE* fp, float *xMin, float *xMax, float *yMin, float *yMax, int *numPoints){
+	*numPoints=0;
+	*xMax=0;
+	*yMax=0;
+	*xMin=FLT_MAX;
+	*yMin=FLT_MAX;
+	char buffer[1000];
+	int n=0;
+	while(!feof(fp))
+	{	
+		float xAux,yAux;
+		fgets(buffer,1000,fp);
+		sscanf(buffer,"%f %f",&xAux,&yAux);
+		if(xAux<*xMin)
+			*xMin=xAux;
+		if(yAux<*yMin)
+			*yMin=yAux;
+		if(xAux>*xMax)
+			*xMax=xAux;
+		if(yAux>*yMax)
+			*yMax=yAux;
+		n++;
+	}
+	*numPoints=n;
+}
 
 int centroideMaisPerto(float x,float y,Ponto* centroides,int size)
 {
@@ -80,10 +107,10 @@ int main(int argc, char* argv[])
 	int numIteracoes;
 	float xMin,xMax,yMin,yMax;
 	
-	xMin=atof(argv[4]);
-	xMax=atof(argv[5]);
-	yMin=atof(argv[6]);
-	yMax=atof(argv[7]);
+	//xMin=atof(argv[4]);
+	//xMax=atof(argv[5]);
+	//yMin=atof(argv[6]);
+	//yMax=atof(argv[7]);
 	
 	FILE* fp;
 	
@@ -92,13 +119,16 @@ int main(int argc, char* argv[])
 	MPI_Init(&argc,&argv);
 	MPI_Comm_size(MPI_COMM_WORLD,&size);
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-	numPoints=atoi(argv[2]);
-	fp=fopen(argv[1],"r");
-	numIteracoes=atoi(argv[3]);
 	
+	//numPoints=atoi(argv[2]);
+	fp=fopen(argv[1],"r");
+	numIteracoes=atoi(argv[2]);
+	
+	descreverOArquivo(fp,&xMin,&xMax,&yMin,&yMax,&numPoints);
+
 	float xCentroide, yCentroide;
-	xCentroide=rank;
-	yCentroide=rank;
+	xCentroide=(((xMax-xMin)/(size+1))*(rank+1))+xMin;
+	yCentroide=(((yMax-yMin)/(size+1))*(rank+1))+yMin;
 	
 	Ponto* centroides = (Ponto*) calloc(sizeof(Ponto)*size,0);
 	centroides[rank].x=xCentroide;
