@@ -12,7 +12,10 @@ typedef struct Point
 {
 	double x;
 	double y;
+	int centroid;
 }Point;
+
+
 
 
 // argv[0] file numIteracoes numCentroids
@@ -37,7 +40,6 @@ int main(int argc, char* argv[])
 		int howMuch = howMuchBytes(fp)/(sizeof(double))/2/(size-1);
 		int initialPosition = 0+rank*2*sizeof(double)*howMuch;
 		Point* myPoints = read(fp, howMuch, initialPosition);
-		
 	}
 	
 	MPI_Finalize();
