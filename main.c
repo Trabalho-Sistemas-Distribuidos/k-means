@@ -12,7 +12,7 @@ typedef struct Point
 {
 	double x;
 	double y;
-	int centroid;
+	Ponto centroid;
 }Point;
 
 
@@ -38,7 +38,8 @@ int main(int argc, char* argv[])
 	{
 		//NumberOfPairs/numberOfProcessor
 		posicione(fp);
-		Ponto* pontos = 
+		Ponto* pontos = lerPontos(fp);
+		
 	}
 	
 	MPI_Finalize();
