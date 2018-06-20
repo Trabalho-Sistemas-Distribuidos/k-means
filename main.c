@@ -37,9 +37,8 @@ int main(int argc, char* argv[])
 	else //ordinal user -- slave
 	{
 		//NumberOfPairs/numberOfProcessor
-		int howMuch = howMuchBytes(fp)/(sizeof(double))/2/(size-1);
-		int initialPosition = 0+rank*2*sizeof(double)*howMuch;
-		Point* myPoints = read(fp, howMuch, initialPosition);
+		posicione(fp);
+		Ponto* pontos = 
 	}
 	
 	MPI_Finalize();
